@@ -1,7 +1,9 @@
 import Layout from "../components/Layout";
 import React from "react";
+import { useRouter } from "next/router";
 
 function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
   const setUsernameHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -10,9 +12,21 @@ function LoginPage() {
   const setPasswordHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.currentTarget.value);
   };
-  const submitHandler = (event: React.FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(username, password);
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+    if (response.status === 200) {
+      router.push("/");
+    } else {
+      console.error("Login error", response);
+    }
   };
 
   return (
